@@ -13,6 +13,21 @@ from flask import jsonify, request, Blueprint, redirect
 from flask_restless import APIManager
 from flask_restless.helpers import *
 
+
+from sqlalchemy.orm.attributes import InstrumentedAttribute
+from sqlalchemy.ext.hybrid import hybrid_property
+
+COLUMN_TYPES = (InstrumentedAttribute, hybrid_property)
+
+def get_columns(model):
+    columns = {}
+    for superclass in model.__mro__:
+        for name, column in superclass.__dict__.items():
+            if isinstance(column, COLUMN_TYPES):
+                columns[name] = column
+    return columns
+
+
 sqlalchemy_swagger_type = {
     'INTEGER': 'integer',
     'SMALLINT': 'int32',
